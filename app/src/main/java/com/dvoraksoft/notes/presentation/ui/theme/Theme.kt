@@ -1,6 +1,5 @@
-package com.dvoraksoft.notes.ui.theme
+package com.dvoraksoft.notes.presentation.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

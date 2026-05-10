@@ -1,4 +1,4 @@
-package com.dvoraksoft.notes.ui.theme
+package com.dvoraksoft.notes.presentation.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
