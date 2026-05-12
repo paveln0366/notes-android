@@ -27,7 +27,6 @@ fun NotesScreenPreview() {
     }
 }
 
-
 @Composable
 fun NotesScreen(
     modifier: Modifier = Modifier,
@@ -37,7 +36,7 @@ fun NotesScreen(
     val state by viewModel.state.collectAsState()
 
     LazyColumn(
-        modifier = Modifier
+        modifier = modifier
             .padding(top = 48.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -47,7 +46,10 @@ fun NotesScreen(
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(state.pinnedNotes) { note ->
+                items(
+                    items = state.pinnedNotes,
+                    key = { it.id }
+                ) { note ->
                     NotesCard(
                         note = note,
                         onNoteClick = {
@@ -57,7 +59,10 @@ fun NotesScreen(
                 }
             }
         }
-        items(state.otherNotes) { note ->
+        items(
+            items = state.otherNotes,
+            key = { it.id }
+        ) { note ->
             NotesCard(
                 note = note,
                 onNoteClick = {
@@ -75,7 +80,7 @@ fun NotesCard(
     onNoteClick: (Note) -> Unit
 ) {
     Text(
-        modifier = Modifier.clickable {
+        modifier = modifier.clickable {
             onNoteClick(note)
         },
         text = "${note.title} - ${note.content}",
