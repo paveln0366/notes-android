@@ -78,7 +78,7 @@ object TestNotesRepositoryImpl : NotesRepository {
         notesListFlow.update { oldList ->
             oldList.map {
                 if (it.id == noteId) {
-                    it.copy(isPinned = it.isPinned)
+                    it.copy(isPinned = !it.isPinned)
                 } else {
                     it
                 }
