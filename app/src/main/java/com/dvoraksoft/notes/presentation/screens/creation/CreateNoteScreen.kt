@@ -19,6 +19,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,7 +36,9 @@ import com.dvoraksoft.notes.presentation.utils.DateFormatter
 @Composable
 fun NotesScreenPreview() {
     NotesTheme {
-        CreateNoteScreen()
+        CreateNoteScreen(
+            onFinished = {}
+        )
     }
 }
 
@@ -43,7 +46,8 @@ fun NotesScreenPreview() {
 @Composable
 fun CreateNoteScreen(
     modifier: Modifier = Modifier,
-    viewModel: CreateNoteViewModel = viewModel()
+    viewModel: CreateNoteViewModel = viewModel(),
+    onFinished: () -> Unit
 ) {
     val state = viewModel.state.collectAsState()
     val currentState = state.value
@@ -169,7 +173,9 @@ fun CreateNoteScreen(
         }
 
         CreateNoteState.Finished -> {
-
+            LaunchedEffect(key1 = Unit) {
+                onFinished()
+            }
         }
     }
 }
