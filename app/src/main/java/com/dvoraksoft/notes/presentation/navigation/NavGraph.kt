@@ -3,51 +3,99 @@ package com.dvoraksoft.notes.presentation.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.dvoraksoft.notes.presentation.screens.creation.CreateNoteScreen
 import com.dvoraksoft.notes.presentation.screens.editing.EditNoteScreen
 import com.dvoraksoft.notes.presentation.screens.notes.NotesScreen
 
 @Composable
 fun NavGraph() {
-    val screen = remember {
-        mutableStateOf<Screen>(Screen.Notes)
-    }
-    when (val currentScreen = screen.value) {
-        Screen.CreateNote -> {
-            CreateNoteScreen(
-                onFinished = {
-                    screen.value = Screen.Notes
-                }
-            )
-        }
+    val navController = rememberNavController()
 
-        is Screen.EditNote -> {
-            EditNoteScreen(
-                noteId = currentScreen.noteId,
-                onFinished = {
-                    screen.value = Screen.Notes
-                }
-            )
-        }
-
-        Screen.Notes -> {
+    NavHost(
+        navController = navController,
+        startDestination = Screen.Notes.route
+    ) {
+        composable(Screen.Notes.route) {
             NotesScreen(
                 onNoteClick = {
-                    screen.value = Screen.EditNote(it.id)
+                    navController.navigate(Screen.EditNote.route)
                 },
                 onAddNoteClick = {
-                    screen.value = Screen.CreateNote
+                    navController.navigate(Screen.CreateNote.route)
+                }
+            )
+        }
+        composable(Screen.CreateNote.route) {
+            CreateNoteScreen(
+                onFinished = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable(Screen.EditNote.route) {
+            EditNoteScreen(
+                noteId = 5,
+                onFinished = {
+                    navController.popBackStack()
                 }
             )
         }
     }
 }
 
-sealed interface Screen {
+@Composable
+fun CustomNavGraph() {
+    val customScreen = remember {
+        mutableStateOf<CustomScreen>(CustomScreen.Notes)
+    }
+    when (val currentScreen = customScreen.value) {
+        CustomScreen.CreateNote -> {
+            CreateNoteScreen(
+                onFinished = {
+                    customScreen.value = CustomScreen.Notes
+                }
+            )
+        }
 
-    data object Notes : Screen
+        is CustomScreen.EditNote -> {
+            EditNoteScreen(
+                noteId = currentScreen.noteId,
+                onFinished = {
+                    customScreen.value = CustomScreen.Notes
+                }
+            )
+        }
 
-    data object CreateNote : Screen
+        CustomScreen.Notes -> {
+            NotesScreen(
+                onNoteClick = {
+                    customScreen.value = CustomScreen.EditNote(it.id)
+                },
+                onAddNoteClick = {
+                    customScreen.value = CustomScreen.CreateNote
+                }
+            )
+        }
+    }
+}
 
-    data class EditNote(val noteId: Int) : Screen
+sealed class Screen(val route: String) {
+
+    data object Notes : Screen("notes")
+
+    data object CreateNote : Screen("create_note")
+
+    data object EditNote : Screen("edit_note")
+}
+
+sealed interface CustomScreen {
+
+    data object Notes : CustomScreen
+
+    data object CreateNote : CustomScreen
+
+    data class EditNote(val noteId: Int) : CustomScreen
 }
