@@ -1,5 +1,6 @@
 package com.dvoraksoft.notes.presentation.navigation
 
+import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,7 +22,7 @@ fun NavGraph() {
         composable(Screen.Notes.route) {
             NotesScreen(
                 onNoteClick = {
-                    navController.navigate(Screen.EditNote.route)
+                    navController.navigate(Screen.EditNote.createRoute(it.id)) // edit_note/5
                 },
                 onAddNoteClick = {
                     navController.navigate(Screen.CreateNote.route)
@@ -36,8 +37,10 @@ fun NavGraph() {
             )
         }
         composable(Screen.EditNote.route) {
+            val noteId = Screen.EditNote.getNoteId(it.arguments)
+
             EditNoteScreen(
-                noteId = 5,
+                noteId = noteId,
                 onFinished = {
                     navController.popBackStack()
                 }
@@ -88,7 +91,16 @@ sealed class Screen(val route: String) {
 
     data object CreateNote : Screen("create_note")
 
-    data object EditNote : Screen("edit_note")
+    data object EditNote : Screen("edit_note/{note_id}") { // Bundle("note_id" - "5")
+
+        fun createRoute(noteId: Int): String { // edit_note/5
+            return "edit_note/$noteId"
+        }
+
+        fun getNoteId(arguments: Bundle?): Int {
+            return arguments?.getString("note_id")?.toInt() ?: 0
+        }
+    }
 }
 
 sealed interface CustomScreen {
