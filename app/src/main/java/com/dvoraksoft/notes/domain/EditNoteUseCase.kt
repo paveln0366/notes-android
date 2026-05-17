@@ -1,6 +1,8 @@
 package com.dvoraksoft.notes.domain
 
-class EditNoteUseCase(
+import javax.inject.Inject
+
+class EditNoteUseCase @Inject constructor(
     private val repository: NotesRepository
 ) {
 
