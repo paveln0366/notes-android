@@ -1,13 +1,45 @@
 package com.dvoraksoft.notes.data
 
+import com.dvoraksoft.notes.domain.ContentItem
 import com.dvoraksoft.notes.domain.Note
+import kotlinx.serialization.json.Json
 
 fun Note.toDbModel(): NoteDbModel {
-    return NoteDbModel(id, title, content, updatedAt, isPinned)
+    val contentAsString = Json.encodeToString(content.toContentItemDbModels())
+    return NoteDbModel(id, title, contentAsString, updatedAt, isPinned)
+}
+
+fun List<ContentItem>.toContentItemDbModels(): List<ContentItemDbModel> {
+    return map { contentItem ->
+        when (contentItem) {
+            is ContentItem.Image -> {
+                ContentItemDbModel.Image(url = contentItem.url)
+            }
+
+            is ContentItem.Text -> {
+                ContentItemDbModel.Text(content = contentItem.content)
+            }
+        }
+    }
+}
+
+fun List<ContentItemDbModel>.toContentItems(): List<ContentItem> {
+    return map { contentItem ->
+        when (contentItem) {
+            is ContentItemDbModel.Image -> {
+                ContentItem.Image(url = contentItem.url)
+            }
+
+            is ContentItemDbModel.Text -> {
+                ContentItem.Text(content = contentItem.content)
+            }
+        }
+    }
 }
 
 fun NoteDbModel.toEntity(): Note {
-    return Note(id, title, content, updatedAt, isPinned)
+    val contentItemDbModels = Json.decodeFromString<List<ContentItemDbModel>>(content)
+    return Note(id, title, contentItemDbModels.toContentItems(), updatedAt, isPinned)
 }
 
 fun List<NoteDbModel>.toEntities(): List<Note> {
