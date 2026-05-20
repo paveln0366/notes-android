@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.dvoraksoft.notes.R
+import com.dvoraksoft.notes.domain.ContentItem
 import com.dvoraksoft.notes.domain.Note
 import com.dvoraksoft.notes.presentation.ui.theme.OtherNotesColors
 import com.dvoraksoft.notes.presentation.ui.theme.PinnedNotesColors
@@ -48,7 +49,7 @@ fun NotesScreen(
     modifier: Modifier = Modifier,
     viewModel: NotesViewModel = hiltViewModel(),
     onNoteClick: (Note) -> Unit,
-    onAddNoteClick: () -> Unit,
+    onAddNoteClick: () -> Unit
 ) {
 
     val state by viewModel.state.collectAsState()
@@ -262,13 +263,18 @@ fun NoteCard(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(modifier = Modifier.height(24.dp))
-        Text(
-            text = note.content,
-            fontSize = 12.sp,
-            maxLines = 3,
-            color = MaterialTheme.colorScheme.onSurface,
-            fontWeight = FontWeight.Medium,
-            overflow = TextOverflow.Ellipsis
-        )
+        note.content
+            .filterIsInstance<ContentItem.Text>()
+            .joinToString("\n") { it.content }
+            .let {
+                Text(
+                    text = it,
+                    fontSize = 12.sp,
+                    maxLines = 3,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Medium,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
     }
 }

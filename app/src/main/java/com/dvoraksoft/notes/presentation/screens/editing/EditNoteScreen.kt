@@ -2,6 +2,7 @@ package com.dvoraksoft.notes.presentation.screens.editing
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,8 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.dvoraksoft.notes.presentation.screens.editing.EditNoteCommand.InputContent
-import com.dvoraksoft.notes.presentation.screens.editing.EditNoteCommand.InputTitle
+import com.dvoraksoft.notes.domain.ContentItem
 import com.dvoraksoft.notes.presentation.ui.theme.NotesTheme
 import com.dvoraksoft.notes.presentation.utils.DateFormatter
 
@@ -114,7 +114,7 @@ fun EditNoteScreen(
                             .padding(horizontal = 8.dp),
                         value = currentState.note.title,
                         onValueChange = {
-                            viewModel.processCommand(InputTitle(it))
+                            viewModel.processCommand(EditNoteCommand.InputTitle(it))
                         },
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
@@ -142,33 +142,16 @@ fun EditNoteScreen(
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    TextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 8.dp)
-                            .weight(1f),
-                        value = currentState.note.content,
-                        onValueChange = {
-                            viewModel.processCommand(InputContent(it))
-                        },
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                        ),
-                        textStyle = TextStyle(
-                            fontSize = 16.sp,
-                            color = MaterialTheme.colorScheme.onSurface
-                        ),
-                        placeholder = {
-                            Text(
-                                text = "Note something down",
-                                fontSize = 16.sp,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
+                    currentState.note.content.filterIsInstance<ContentItem.Text>()
+                        .forEach { contentItem ->
+                            TextContent(
+                                modifier = Modifier.weight(1f),
+                                text = contentItem.content,
+                                onTextChange = {
+                                    viewModel.processCommand(EditNoteCommand.InputContent(it))
+                                }
                             )
                         }
-                    )
                     Button(
                         modifier = Modifier
                             .padding(horizontal = 24.dp)
@@ -201,4 +184,36 @@ fun EditNoteScreen(
 
         EditNoteState.Initial -> {}
     }
+}
+
+@Composable
+private fun ColumnScope.TextContent(
+    modifier: Modifier = Modifier,
+    text: String,
+    onTextChange: (String) -> Unit
+) {
+    TextField(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp),
+        value = text,
+        onValueChange = onTextChange,
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+        ),
+        textStyle = TextStyle(
+            fontSize = 16.sp,
+            color = MaterialTheme.colorScheme.onSurface
+        ),
+        placeholder = {
+            Text(
+                text = "Note something down",
+                fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
+            )
+        }
+    )
 }
