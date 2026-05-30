@@ -1,5 +1,8 @@
 package com.dvoraksoft.notes.presentation.screens.creation
 
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.dvoraksoft.notes.presentation.ui.theme.CustomIcons
 import com.dvoraksoft.notes.presentation.ui.theme.NotesTheme
 import com.dvoraksoft.notes.presentation.utils.DateFormatter
 
@@ -51,6 +55,13 @@ fun CreateNoteScreen(
 ) {
     val state = viewModel.state.collectAsState()
     val currentState = state.value
+
+    val imagePicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = {
+            Log.d("CreateNoteScreen", it.toString())
+        }
+    )
 
     when (currentState) {
         is CreateNoteState.Creation -> {
@@ -79,6 +90,18 @@ fun CreateNoteScreen(
                                     },
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Back"
+                            )
+                        },
+                        actions = {
+                            Icon(
+                                modifier = Modifier
+                                    .clickable {
+                                        imagePicker.launch("image/*")
+                                    }
+                                    .padding(end = 24.dp),
+                                imageVector = CustomIcons.AddPhoto,
+                                contentDescription = "Add photo from gallery",
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     )
